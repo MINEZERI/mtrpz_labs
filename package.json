@@ -1,0 +1,19 @@
+{
+  "name": "mtrpz_labs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "equation": "node lab1/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MINEZERI/mtrpz_labs.git"
+  },
+  "author": "minezeri",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MINEZERI/mtrpz_labs/issues"
+  },
+  "homepage": "https://github.com/MINEZERI/mtrpz_labs#readme"
+}
