@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
-  "scripts": {
-    "equation": "node lab1/main.js"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MINEZERI/mtrpz_labs.git"
