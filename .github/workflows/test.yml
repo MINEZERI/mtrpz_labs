@@ -1,0 +1,31 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lab2/**'
+
+jobs:
+  test:
+    runs-on: node22
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: |
+          cd lab2
+          npm install
+
+      - name: Run tests
+        run: |
+          cd lab2
+          npm test
