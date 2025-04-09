@@ -42,7 +42,7 @@ describe("Node", () => {
     console.log(nodeJSON);
     console.log(parsedNode);
 
-    expect(parsedNode).toBe({
+    expect(parsedNode).toStrictEqual({
       value: "b",
       prev: "a",
       next: "c",
