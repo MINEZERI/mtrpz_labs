@@ -47,7 +47,10 @@ export default class LinkedList {
     if (!this.#headNode) {
       this.#headNode = newNode;
       this.#tailNode = newNode;
-      return this.#length++;
+
+      this.#length++;
+
+      return this;
     }
 
     this.#tailNode.next = newNode;
@@ -66,34 +69,31 @@ export default class LinkedList {
       throw new RangeError(`index out of bounds: ${index}`);
 
     const newNode = new Node(char);
+    let prevNode = null;
+    let nextNode = null;
+
+    if (this.length === 0) {
+      this.#headNode = newNode;
+      this.#tailNode = newNode;
+      return this;
+    }
 
     if (index === 0) {
-      if (this.#headNode) {
-        newNode.next = this.#headNode;
-        this.#headNode.prev = newNode;
-      }
+      nextNode = this.#headNode;
       this.#headNode = newNode;
-
-      this.#length++;
-
-      return this;
-    }
-
-    if (index === this.length) {
-      this.#tailNode.next = newNode;
-      newNode.prev = this.#tailNode;
+    } else if (index === this.length) {
+      prevNode = this.#tailNode;
       this.#tailNode = newNode;
-
-      this.#length++;
-
-      return this;
+    } else {
+      nextNode = this.at(index);
+      prevNode = nextNode.prev;
     }
 
-    let node = this.at(index);
-    newNode.prev = node.prev;
-    newNode.next = node;
-    node.prev.next = newNode;
-    node.prev = newNode;
+    newNode.prev = prevNode;
+    newNode.next = nextNode;
+
+    if (prevNode) prevNode.next = newNode;
+    if (nextNode) nextNode.prev = newNode;
 
     this.#length++;
 
