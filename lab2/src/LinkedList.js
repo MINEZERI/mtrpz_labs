@@ -55,6 +55,8 @@ export default class LinkedList {
     this.#tailNode = newNode;
 
     this.#length++;
+
+    return this;
   }
 
   insert(char, index) {
@@ -89,6 +91,8 @@ export default class LinkedList {
     node.prev = newNode;
 
     this.#length++;
+
+    return this;
   }
 
   #deleteNode(node) {
