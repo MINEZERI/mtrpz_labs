@@ -75,6 +75,8 @@ export default class LinkedList {
     if (this.length === 0) {
       this.#headNode = newNode;
       this.#tailNode = newNode;
+
+      this.#length++;
       return this;
     }
 
