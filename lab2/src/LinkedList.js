@@ -72,16 +72,21 @@ export default class LinkedList {
         newNode.next = this.#headNode;
         this.#headNode.prev = newNode;
       }
-
       this.#headNode = newNode;
-      return this.#length++;
+
+      this.#length++;
+
+      return this;
     }
 
     if (index === this.length) {
       this.#tailNode.next = newNode;
       newNode.prev = this.#tailNode;
       this.#tailNode = newNode;
-      return this.#length++;
+
+      this.#length++;
+
+      return this;
     }
 
     let node = this.at(index);
@@ -146,6 +151,18 @@ export default class LinkedList {
 
     let node = this.at(index);
     return node.value;
+  }
+
+  toArray() {
+    const arr = [];
+
+    let node = this.#headNode;
+    while (node) {
+      arr.push(node.value);
+      node = node.next;
+    }
+
+    return arr;
   }
 }
 

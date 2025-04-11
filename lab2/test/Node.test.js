@@ -38,9 +38,6 @@ describe("Node", () => {
   test("serializes to JSON correctly", () => {
     const nodeJSON = JSON.stringify(node);
     const parsedNode = JSON.parse(nodeJSON);
-    console.log(node);
-    console.log(nodeJSON);
-    console.log(parsedNode);
 
     expect(parsedNode).toStrictEqual({
       value: "b",
