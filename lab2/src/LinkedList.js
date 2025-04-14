@@ -222,7 +222,7 @@ export default class LinkedList {
       if (node.value === char) return i;
 
       node = node.prev;
-      i++;
+      i--;
     }
 
     return -1;
