@@ -1,4 +1,4 @@
-import LinkedList from "../src/LinkedList.js";
+import LinkedList from "../src/ArrayLinkedList.js";
 
 describe("Linked List", () => {
   let list;
