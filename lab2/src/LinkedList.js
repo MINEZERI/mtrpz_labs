@@ -216,7 +216,7 @@ export default class LinkedList {
       throw new TypeError("Value must be a single character string");
 
     let node = this.#tailNode,
-      i = 0;
+      i = this.length - 1;
 
     while (node) {
       if (node.value === char) return i;
