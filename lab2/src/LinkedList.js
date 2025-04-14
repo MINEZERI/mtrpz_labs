@@ -199,7 +199,7 @@ export default class LinkedList {
       throw new TypeError("Value must be a single character string");
 
     let node = this.#headNode,
-      i = 1; // starting from 1st node
+      i = 0;
 
     while (node) {
       if (node.value === char) return i;
@@ -216,7 +216,7 @@ export default class LinkedList {
       throw new TypeError("Value must be a single character string");
 
     let node = this.#tailNode,
-      i = 1; // starting from 1st node
+      i = 0;
 
     while (node) {
       if (node.value === char) return i;
