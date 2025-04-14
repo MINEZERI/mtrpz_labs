@@ -3,7 +3,23 @@ export default class LinkedList {
   #tailNode = null;
   #length = 0;
 
-  constructor() {}
+  constructor(...values) {
+    values.forEach((val) => {
+      this.append(val);
+    });
+  }
+
+  *[Symbol.iterator]() {
+    let node = this.#headNode;
+    while (node) {
+      yield node.value;
+      node = node.next;
+    }
+  }
+
+  static isValidList(list) {
+    return list instanceof LinkedList;
+  }
 
   get length() {
     return this.#length;
@@ -18,10 +34,12 @@ export default class LinkedList {
   }
 
   at(index) {
-    let normalizedIndex = index < 0 ? index + this.length : index;
-    if (!this.#isValidAccessIndex(normalizedIndex))
-      throw new RangeError(`index out of bounds: ${index}`);
     const len = this.length;
+    if (len === 0) return;
+    let normalizedIndex = index < 0 ? index + len : index;
+    if (!this.#isValidAccessIndex(normalizedIndex)) {
+      throw new RangeError(`Index out of bounds: ${index}`);
+    }
 
     let node;
     if (normalizedIndex < len / 2) {
@@ -66,7 +84,7 @@ export default class LinkedList {
     if (!Node.isValidValue(char))
       throw new TypeError("Value must be a single character string");
     if (!this.#isValidInsertIndex(index))
-      throw new RangeError(`index out of bounds: ${index}`);
+      throw new RangeError(`Index out of bounds: ${index}`);
 
     const newNode = new Node(char);
     let prevNode = null;
@@ -125,7 +143,7 @@ export default class LinkedList {
 
   delete(index) {
     if (!this.#isValidAccessIndex(index))
-      throw new RangeError(`index out of bounds: ${index}`);
+      throw new RangeError(`Index out of bounds: ${index}`);
 
     const node = this.at(index); // a <> b <> c  ==>  a <> c
 
@@ -149,22 +167,107 @@ export default class LinkedList {
 
   get(index) {
     if (!this.#isValidAccessIndex(index))
-      throw new RangeError(`index out of bounds: ${index}`);
+      throw new RangeError(`Index out of bounds: ${index}`);
 
-    let node = this.at(index);
-    return node.value;
+    return this.at(index).value;
   }
 
-  toArray() {
-    const arr = [];
+  clone() {
+    return new LinkedList(...this);
+  }
 
+  reverse() {
     let node = this.#headNode;
+
     while (node) {
-      arr.push(node.value);
+      const next = node.next;
+
+      node.next = node.prev;
+      node.prev = next;
+
+      if (!node.next) this.#tailNode = node;
+      if (!node.prev) this.#headNode = node;
+
+      node = next;
+    }
+
+    return this;
+  }
+
+  findFirst(char) {
+    if (!Node.isValidValue(char))
+      throw new TypeError("Value must be a single character string");
+
+    let node = this.#headNode,
+      i = 1; // starting from 1st node
+
+    while (node) {
+      if (node.value === char) return i;
+
+      node = node.next;
+      i++;
+    }
+
+    return -1;
+  }
+
+  findLast(char) {
+    if (!Node.isValidValue(char))
+      throw new TypeError("Value must be a single character string");
+
+    let node = this.#tailNode,
+      i = 1; // starting from 1st node
+
+    while (node) {
+      if (node.value === char) return i;
+
+      node = node.prev;
+      i++;
+    }
+
+    return -1;
+  }
+
+  clear() {
+    let leftNode = this.#headNode,
+      rightNode = this.#tailNode;
+    this.#headNode = null;
+    this.#tailNode = null;
+
+    while (leftNode || rightNode) {
+      const next = leftNode.next === rightNode ? null : leftNode.next;
+      const prev = rightNode.prev === leftNode ? null : rightNode.prev;
+
+      [rightNode, leftNode].forEach((node) => {
+        node.next = null;
+        node.prev = null;
+      });
+
+      leftNode = next;
+      rightNode = prev;
+    }
+
+    this.#length = 0;
+
+    return this;
+  }
+
+  extend(list) {
+    if (!LinkedList.isValidList(list))
+      throw new TypeError("Invalid argument: expected a non-empty linked list");
+
+    let node = list.at(0);
+
+    while (node) {
+      this.append(node.value);
       node = node.next;
     }
 
-    return arr;
+    return this;
+  }
+
+  toArray() {
+    return new Array(...this);
   }
 }
 
