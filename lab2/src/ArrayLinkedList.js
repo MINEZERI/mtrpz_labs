@@ -1,7 +1,7 @@
 export default class LinkedList {
-  #nodes;
-  constructor() {
-    this.#nodes = [];
+  #nodes = [];
+  constructor(...values) {
+    this.#nodes.push(...values);
   }
 
   get length() {
@@ -10,6 +10,7 @@ export default class LinkedList {
 
   append(char) {
     this.#nodes.push(char);
+    return this;
   }
 
   insert(char, index) {
@@ -17,6 +18,8 @@ export default class LinkedList {
       throw new RangeError("Index out of bounds");
     }
     this.#nodes.splice(index, 0, char);
+
+    return this;
   }
 
   delete(index) {
@@ -45,6 +48,7 @@ export default class LinkedList {
 
   reverse() {
     this.#nodes.reverse();
+    return this;
   }
 
   findFirst(char) {
@@ -61,5 +65,9 @@ export default class LinkedList {
 
   extend(list) {
     this.#nodes.push(...list.#nodes);
+  }
+
+  toArray() {
+    return [...this.#nodes];
   }
 }
