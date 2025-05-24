@@ -1,10 +1,6 @@
 # Containerization
 
----
-
 ## 1. Python
-
----
 
 **[Github repository](https://github.com/KPI-FICT-MTSD/lab-03-starter-project-python)**  
 
