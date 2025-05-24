@@ -26,7 +26,7 @@ Image building took mush less time because of Docker layer caching.
 
 ### 3. Not ideal Dockerfile
 
-#### A. Adding dependencies after adding project code (not ideal Dockerfile).
+1. Adding dependencies after adding project code (not ideal Dockerfile).
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
@@ -34,7 +34,7 @@ Image building took mush less time because of Docker layer caching.
 
 Inefficient layers usage leads to increased building time.
 
-#### B. After changes in the code (`build/index.html`) with not ideal Dockerfile.
+2. After changes in the code (`build/index.html`) with not ideal Dockerfile.
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
@@ -42,7 +42,7 @@ Inefficient layers usage leads to increased building time.
 
 ### 4. Lighter base image
 
-#### A. Using lighter base image: `python:3.10-alpine` (not ideal Dockerfile).
+1. Using lighter base image: `python:3.10-alpine` (not ideal Dockerfile).
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
@@ -50,7 +50,7 @@ Inefficient layers usage leads to increased building time.
 
 Much smaller building time and size comparing to `python:3.10-buster`.
 
-#### B. Dockerfile is again ideal now.
+2. Dockerfile is again ideal now.
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
@@ -58,7 +58,7 @@ Much smaller building time and size comparing to `python:3.10-buster`.
 
 ### 5. Numpy
 
-#### A. Adding new dependency: `numpy`. Using lighter base image: `python:3.10-alpine`.
+1. Adding new dependency: `numpy`. Using lighter base image: `python:3.10-alpine`.
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
@@ -66,7 +66,7 @@ Much smaller building time and size comparing to `python:3.10-buster`.
 
 Building time and size increased due to the large size of the`numpy` library.
 
-#### B. Using `python:3.10-buster` base image.
+1. Using `python:3.10-buster` base image.
 
 
 | *Building time:* | *Image size:* |
