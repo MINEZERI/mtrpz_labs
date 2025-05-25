@@ -78,6 +78,8 @@ Along with the size of packages, the size of base image has also grown.
 
 ## 2. Golang
 
+**[Github repository](https://github.com/KPI-FICT-MTSD/lab-03-starter-project-golang)**
+
 ### 1. First image building
 
 Building image using `golang:1.19-alpine`.  
