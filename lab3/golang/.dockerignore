@@ -1,0 +1,7 @@
+.git/
+.gitignore
+*.rst
+*.md
+README.*
+build/
+.idea/
