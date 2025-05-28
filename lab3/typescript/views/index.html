@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Task Manager</title>
+	<style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #task-form { display: flex; margin-bottom: 20px; }
+        #task-input { flex-grow: 1; padding: 8px; margin-right: 10px; }
+        button { padding: 8px 16px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        button.delete { background: #f44336; }
+        ul { list-style: none; padding: 0; }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .task-completed { text-decoration: line-through; opacity: 0.7; }
+	</style>
+</head>
+<body>
+<h1>Task Manager</h1>
+
+<div id="task-form">
+	<input type="text" id="task-input" placeholder="New task">
+	<button onclick="addTask()">Add Task</button>
+</div>
+
+<ul id="task-list"></ul>
+
+<script>
+	// GET
+	async function loadTasks() {
+		const response = await fetch('/api/task');
+		const tasks = await response.json();
+
+		const list = document.getElementById('task-list');
+		list.innerHTML = tasks.map(task => `
+            <li data-id="${task.id}">
+                <input
+                    type="checkbox"
+                    ${task.completed ? 'checked' : ''}
+                    onchange="toggleTask(${task.id}, this.checked)"
+                >
+                <span class="${task.completed ? 'task-completed' : ''}">${task.description}</span>
+                <button class="delete" onclick="deleteTask(${task.id})">Delete</button>
+            </li>
+        `).join('');
+	}
+
+	// POST
+	async function addTask() {
+		const input = document.getElementById('task-input');
+		if (!input.value.trim()) return;
+
+		await fetch('/api/task', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ description: input.value })
+		});
+		input.value = '';
+		loadTasks();
+	}
+
+	// DELETE
+	async function deleteTask(id) {
+		await fetch(`/api/task/${id}`, { method: 'DELETE' });
+		document.querySelector(`li[data-id="${id}"]`)?.remove();
+	}
+
+	// PATCH
+	async function toggleTask(id, completed) {
+		await fetch(`/api/task/${id}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ completed })
+		});
+
+		const taskText = document.querySelector(`li[data-id="${id}"] span`);
+		if (taskText) {
+			taskText.classList.toggle('task-completed', completed);
+		}
+	}
+
+	loadTasks();
+</script>
+</body>
+</html>

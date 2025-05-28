@@ -6,9 +6,9 @@
 
 ### 1. First image building
 
-Building image with ideal Dockerfile.
+Building image with optimal Dockerfile.
 
-Base image: `python:3.10-buster`.
+Base image used: `python:3.10-buster`.
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
@@ -16,7 +16,7 @@ Base image: `python:3.10-buster`.
 
 ### 2. Changes in code
 
-After changes in the code (`build/index.html`).
+After changes in the code (`build/index.html`). 
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
@@ -24,17 +24,17 @@ After changes in the code (`build/index.html`).
 
 Image building took much less time because of Docker layer caching.
 
-### 3. Not ideal Dockerfile
+### 3. Non-optimal Dockerfile
 
-#### 1. Adding dependencies after adding project code (not ideal Dockerfile).
+#### 1. Adding dependencies after copying the project code (non-optimal Dockerfile).
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
 | 71.3s            | 1.41GB        |
 
-Inefficient layers usage leads to increased building time.
+Inefficient layer usage increases build time.
 
-#### 2. After changes in the code (`build/index.html`) with not ideal Dockerfile.
+#### 2. After changes in the code (`build/index.html`) with non-optimal Dockerfile.
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
@@ -42,15 +42,15 @@ Inefficient layers usage leads to increased building time.
 
 ### 4. Lighter base image
 
-#### 1. Using lighter base image: `python:3.10-alpine` (not ideal Dockerfile).
+#### 1. Using lighter base image: `python:3.10-alpine` (non-optimal Dockerfile).
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
 | 25.1s            | 188MB         |
 
-Much smaller building time and size comparing to `python:3.10-buster`.
+Significantly reduced build time and image size compared to `python:3.10-buster`.
 
-#### 2. Dockerfile is again ideal now.
+#### 2. Dockerfile is again optimal now.
 
 | *Building time:* | *Image size:* |
 |------------------|---------------|
@@ -64,7 +64,7 @@ Much smaller building time and size comparing to `python:3.10-buster`.
 |------------------|---------------|
 | 28.7s            | 322MB         |
 
-Building time and size increased due to the large size of the`numpy` library.
+Build time and image size increased because of the `numpy` library's large footprint.
 
 #### 2. Using `python:3.10-buster` base image.
 
@@ -73,8 +73,7 @@ Building time and size increased due to the large size of the`numpy` library.
 |------------------|---------------|
 | 35.9s            | 1.53GB        |
 
-
-Along with the size of packages, the size of base image has also grown.
+Now the image size increased again because of base image size.
 
 ## 2. Golang
 
@@ -105,7 +104,7 @@ CMD ["./build/fizzbuzz", "serve"]
 
 ### 2. Multi-stage build
 
-Some files, like `README.rst` or `go.sum`, are unnecessary in final image. So we're going to create `.dockerignore` file and implement multi-stage build.
+Files such as `README.rst` and `go.sum` are unnecessary in the final image. So we're going to create `.dockerignore` file and implement multi-stage build.
 
 **New Dockerfile** looks like:
 
@@ -154,7 +153,7 @@ Solution for this problem will be copying `index.html` in scratch image too:
 COPY --from=builder /app/templates ./templates
 ```
 
-Now app is running perfectly.
+The application now runs correctly.
 
 This image is perfect for production due to it's extremely minimal size (`14.9MB`). But not convenient to perform any actions inside the container by the same reason. 
 
@@ -162,5 +161,144 @@ This image is perfect for production due to it's extremely minimal size (`14.9MB
 
 Building final image using `gcr.io/distroless/base`. Image size is `49MB`.
 
-Distroless is better than scratch, slightly heavier, but now it is more comfortably to debug or perform any actions inside the container.
+Distroless is preferable to scratch - though slightly larger - as it facilitates debugging or performing any other actions inside the container.
 
+## 3. Typescript
+
+### 1. First image building
+
+First, we will build simple Dockerfile:
+
+```dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm ci
+
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]
+```
+
+#### 1. First image build:
+| *Building time:* | *Image size:* |
+|------------------|---------------|
+| 17.5s            | 280MB         |
+
+#### 2. After changes in the code:
+
+| *Building time:* | *Image size:* |
+|------------------|---------------|
+| 12.5s            | 280MB         |
+
+Image used for DB: `postgres:15-alpine`. Image size: `391MB`.
+
+This approach is somewhat brute-force. But we are going to improve it by using multi-stage building and lighter base images.
+
+### 2. Better Dockerfile
+
+Now we will use layers for efficient image building.
+
+New Dockerfile:
+
+```dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json .
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]
+```
+
+Here we copy dependencies before other project files. This will optimize image building when we change just code, but not dependencies.
+
+#### 1. First image build:
+
+| *Building time:* | *Image size:* |
+|------------------|---------------|
+| 17.8s            | 280MB         |
+
+#### 2. After changes in the code:
+
+| *Building time:* | *Image size:* |
+|------------------|---------------|
+| 4.7s             | 280MB         |
+
+As we see, this approach optimized image building by using layers (caching dependencies).
+
+### 3. Multi-stage build
+
+We will now split the Dockerfile into stages to ensure the final image includes only runtime-essential files.
+
+New Dockerfile:
+
+```dockerfile
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json .
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+RUN npm prune --production
+
+FROM gcr.io/distroless/nodejs20-debian12
+
+WORKDIR /app
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/views ./views
+
+EXPOSE 3000
+
+CMD ["dist/app.js"]
+```
+
+Here we install dependencies and transpile source code on the first stage, afterwards deleting dev dependencies. On the second stage we use `gcr.io/distroless/nodejs20-debian12` to decrease image size and copy only necessary files.
+
+#### 1. First image build:
+
+| *Building time:* | *Image size:* |
+|------------------|---------------|
+| 17.0s            | 187MB         |
+ 
+#### 2. After changes in the code:
+
+| *Building time:* | *Image size:* |
+|------------------|---------------|
+| 4.7s             | 187MB         |
+
+Now image size has been minimized and only files needed for the app to run have been copied. And this didn't affect building time a lot.
+
+## Conclusion
+
+Dockerfile optimization - through layered builds, multi-stage builds, and minimal base images - significantly improves image performance.  
+Key takeaways:
+
+- Layer caching accelerates rebuilds when only code changes.
+
+- Multi-stage builds minimize production image size by excluding build-time dependencies (e.g., reducing a 280MB image to 187MB).
+
+- Distroless/scratch images enhance security and efficiency for production.
+
+For developers, these practices save time; for deployments, they reduce resource overhead.
