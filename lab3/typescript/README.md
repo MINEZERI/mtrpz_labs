@@ -30,7 +30,7 @@ Ensure that you have PostgreSQL database running with correct configured `.env` 
 
 Ensure you have [Docker](https://www.docker.com/) installed on your machine.
 
-Run this project in Docker using this command in project root:
+Run this project in Docker using this command:
 
 ```bash
 ~/project $ docker compose up
